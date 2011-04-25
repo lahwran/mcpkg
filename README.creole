@@ -1,11 +1,9 @@
-mcpkg-python
-============
+= mcpkg-python =
 
 The new mcpkg, now with 100% more python.
 
 
-Goals and such
---------------
+==Features, Goals, and such==
 
 * Simplicity for users of all operating systems
 ** Py2EXE, py2app, good gui toolkit
