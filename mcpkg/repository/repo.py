@@ -15,6 +15,9 @@ class Repo(object):
 		self.sections = []
 		if loadnow:
 			self._load()
+	def load(self):
+		self._load()
+	"""Internal method. Do not call from outside this class!"""
 	def _load(self):
 		print "Loading repository from " + self.url
 		f = helpers.openAnything(self.url)
