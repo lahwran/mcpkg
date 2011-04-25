@@ -7,7 +7,7 @@ class RepositoryException(Exception):
 	def __init__(self, msg):
 		self.msg = msg
 	def __str__(self):
-		return repr(self.msg)
+		return str(self.msg)
 
 class Repo(object):
 	def __init__(self, url, loadnow=True):
@@ -61,3 +61,5 @@ class Repo(object):
 				if package.description:
 					print "Description:"
 					print package.description
+
+
