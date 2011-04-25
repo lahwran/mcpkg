@@ -1,5 +1,5 @@
 #This is just a data holding class
-class Package:
+class Package(object):
 	def __init__(self):
 		self.name = ""
 		self.author = ""

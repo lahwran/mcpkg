@@ -9,7 +9,7 @@ class RepositoryException(Exception):
 	def __str__(self):
 		return repr(self.msg)
 
-class Repo:
+class Repo(object):
 	def __init__(self, url, loadnow=True):
 		self.url = url
 		self.sections = []
@@ -18,8 +18,13 @@ class Repo:
 	def _load(self):
 		print "Loading repository from " + self.url
 		f = helpers.openAnything(self.url)
-		doc = xml.dom.minidom.parse(f)
-		f.close()
+		doc = False #this could be anything
+		try:
+			doc = xml.dom.minidom.parse(f)
+		except xml.parsers.expat.ExpatError as e:
+			raise RepositoryException("Failed to load repository: {0}".format(e))
+		finally:
+			f.close()
 		root = doc.firstChild #<mcpkg>
 		for section in root.childNodes:
 			if section.nodeName != "section":
@@ -32,7 +37,7 @@ class Repo:
 			for package in section.childNodes:
 				if package.nodeName != "package":
 					continue
-				if not ("name", "author", "version", "mcver" in package.attributes.keys()):
+				if not all(a in package.attributes.keys() for a in ("name", "author", "version", "mcver")):
 					print 'Invalid <package>: Missing attribute(s), skipping'
 					continue
 				p = Package()
