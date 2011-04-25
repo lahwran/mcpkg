@@ -10,10 +10,11 @@ class RepositoryException(Exception):
 		return repr(self.msg)
 
 class Repo:
-	def __init__(self, url):
+	def __init__(self, url, loadnow=True):
 		self.url = url
 		self.sections = []
-		self._load()
+		if loadnow:
+			self._load()
 	def _load(self):
 		print "Loading repository from " + self.url
 		f = helpers.openAnything(self.url)
@@ -39,6 +40,9 @@ class Repo:
 				p.author = package.attributes["author"].value
 				p.version = package.attributes["version"].value
 				p.mcver = package.attributes["mcver"].value
+				for pkginfo in package.childNodes:
+					if pkginfo.nodeName == "description":
+						p.description = pkginfo.firstChild.nodeValue #why is this a child node?
 				s.packages.append(p)
 			self.sections.append(s)
 		print "{0} section(s) in repository".format(len(self.sections))
@@ -46,3 +50,6 @@ class Repo:
 			print "Section '{0}' with '{1}' packages".format(section.name, len(section.packages))
 			for package in section.packages:
 				print package
+				if package.description:
+					print "Description:"
+					print package.description
