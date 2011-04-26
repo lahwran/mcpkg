@@ -3,6 +3,7 @@ from .. import helpers
 from .package import Package
 from .section import Section
 import xml.dom.minidom
+import time
 class RepositoryException(Exception):
 	def __init__(self, msg):
 		self.msg = msg
@@ -13,6 +14,7 @@ class Repo(object):
 	def __init__(self, url, loadnow=True):
 		self.url = url
 		self.sections = []
+		self.expireat = 0
 		if loadnow:
 			self._load()
 	def load(self):
@@ -29,6 +31,9 @@ class Repo(object):
 		finally:
 			f.close()
 		root = doc.firstChild #<mcpkg>
+		if "autorefresh" in root.attributes.keys():
+			refresh = root.attributes["autorefresh"].value
+			self.expireat = time.time() + refresh
 		for section in root.childNodes:
 			if section.nodeName != "section":
 				continue

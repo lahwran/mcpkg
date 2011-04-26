@@ -2,6 +2,8 @@
 from . import *
 import cPickle
 import gzip
+import time
+import os.path
 class RepoManager(object):
 	
 	def __init__(self, cachefile, loadnow = True):
@@ -11,11 +13,17 @@ class RepoManager(object):
 			self._loadCache()
 	def _loadCache(self): #internal
 		print "Loading cache...",
+		if not os.path.isfile(self.cachefile):
+			print "Not found, creating..."
+			self._writeCache()
 		try:
 			f = gzip.open(self.cachefile, 'rb')
 			p = cPickle.Unpickler(f)
 			o = p.load()
 			f.close()
+			for rep in o.values():
+				if rep.expireat != 0 and rep.expireat < time.time():
+					del o[rep.url]
 			self.cache = o
 			print "Done"
 		except (IOError) as e:
