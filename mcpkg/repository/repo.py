@@ -15,8 +15,7 @@ class Repo(object):
 		self.url = url
 		self.sections = []
 		self.expireat = 0
-		self.verbosity = verbosity
-		if self.verbosity == 0  :
+		if verbosity == 0  :
                         self.silent = True
                 else :
                         self.silent = False
@@ -26,7 +25,7 @@ class Repo(object):
 		self._load()
 	"""Internal method. Do not call from outside this class!"""
 	def _load(self):
-		if self.printoutput print "Loading repository from " + self.url
+		if not self.silent: print "Loading repository from " + self.url
 		f = helpers.openAnything(self.url)
 		doc = False #this could be anything
 		try:
