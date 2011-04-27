@@ -11,17 +11,22 @@ class RepositoryException(Exception):
 		return str(self.msg)
 
 class Repo(object):
-	def __init__(self, url, loadnow=True):
+	def __init__(self, url, loadnow=True, verbosity=1):
 		self.url = url
 		self.sections = []
 		self.expireat = 0
+		self.verbosity = verbosity
+		if self.verbosity == 0  :
+                        self.silent = True
+                else :
+                        self.silent = False
 		if loadnow:
 			self._load()
 	def load(self):
 		self._load()
 	"""Internal method. Do not call from outside this class!"""
 	def _load(self):
-		print "Loading repository from " + self.url
+		if self.printoutput print "Loading repository from " + self.url
 		f = helpers.openAnything(self.url)
 		doc = False #this could be anything
 		try:
@@ -38,7 +43,7 @@ class Repo(object):
 			if section.nodeName != "section":
 				continue
 			if not "name" in section.attributes.keys():
-				print 'ERROR: Nameless section detected, skipping'
+				if not self.silent : print 'ERROR: Nameless section detected, skipping'
 				continue
 			s = Section()
 			s.name = section.attributes["name"].value
@@ -46,7 +51,7 @@ class Repo(object):
 				if package.nodeName != "package":
 					continue
 				if not all(a in package.attributes.keys() for a in ("name", "author", "version", "mcver")):
-					print 'Invalid <package>: Missing attribute(s), skipping'
+					if not self.silent : print 'Invalid <package>: Missing attribute(s), skipping'
 					continue
 				p = Package()
 				p.name = package.attributes["name"].value
@@ -58,12 +63,12 @@ class Repo(object):
 						p.description = pkginfo.firstChild.nodeValue #why is this a child node?
 				s.packages.append(p)
 			self.sections.append(s)
-		print "{0} section(s) in repository".format(len(self.sections))
+		if not self.silent : print "{0} section(s) in repository".format(len(self.sections))
 		for section in self.sections:
-			print "Section '{0}' with '{1}' packages".format(section.name, len(section.packages))
+			if not self.silent : print "Section '%(name)s' with '%(numpackages)s' packages" % dict(name=section.name, numpackages=len(section.packages))
 			for package in section.packages:
-				print package
-				if package.description:
+				if not self.silent : print package
+				if package.description and not self.silent:
 					print "Description:"
 					print package.description
 
