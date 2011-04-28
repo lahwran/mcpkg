@@ -1,2 +1,2 @@
 #command-line interface
-__all__ = ['main']
+__all__ = ['main', 'config']
