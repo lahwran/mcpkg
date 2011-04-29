@@ -62,13 +62,16 @@ class Repo(object):
 						p.description = pkginfo.firstChild.nodeValue #why is this a child node?
 				s.packages.append(p)
 			self.sections.append(s)
-		if not self.silent : print "{0} section(s) in repository".format(len(self.sections))
+		pkgtotal = 0
 		for section in self.sections:
-			if not self.silent : print "Section '%(name)s' with '%(numpackages)s' packages" % dict(name=section.name, numpackages=len(section.packages))
-			for package in section.packages:
-				if not self.silent : print package
-				if package.description and not self.silent:
-					print "Description:"
-					print package.description
+			pkgtotal += len(section.packages)
+		if not self.silent : print "{0} section(s) in repository, totalling {1} packages".format(len(self.sections), pkgtotal)
+#		for section in self.sections:
+#			if not self.silent : print "Section '%(name)s' with '%(numpackages)s' packages" % dict(name=section.name, numpackages=len(section.packages))
+#			for package in section.packages:
+#				if not self.silent : print package
+#				if package.description and not self.silent:
+#					print "Description:"
+#					print package.description
 
 

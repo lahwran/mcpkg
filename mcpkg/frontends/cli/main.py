@@ -29,14 +29,29 @@ class Main(object):
                 self.parsers['update'] = a
                 self.parsers['maint'] = b
         def _update(self, args):
-                print "Updating index"
                 if args.add_repo :
                         repoarg = args.add_repo[0][0]
                         if repoarg :
-                                r = RepoManager("cache.db.gz")
+                                r = RepoManager(self.conf.get('cache-name'))
                                 r.load(repoarg)
                                 r.writeCache()
                         print "Added %(url)s" % dict(url=repoarg)
+                        return
+                r = RepoManager(self.conf.get('cache-name'))
+				#clear out the cache
+                r.cache = {}
+                try:
+                    f = open(self.conf.get('index-name'), 'rb')
+                except IOError as e:
+                    print "Failed to open %(iname)s: %(reason)s" % dict(iname=self.conf.get('index-name'), reason=str(e))
+                    print "Abort"
+                    return
+                for line in f:
+                    line = line[:-1]
+                    print 'Processing %(url)s ...' % dict(url=line)
+                    r.load(line)
+                f.close()
+                r.writeCache()
         def _maint(self, args):
                 if args.reset_all:
                         print "Performing full reset..."
