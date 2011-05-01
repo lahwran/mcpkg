@@ -32,13 +32,34 @@ class Main(object):
                 if args.add_repo :
                         repoarg = args.add_repo[0][0]
                         if repoarg :
+                                if os.path.exists(self.conf.get("index-name")) :
+                                        fileobj = open(self.conf.get("index-name"), "rb")
+                                        lines = fileobj.read().replace("\r", "").split("\n")
+                                        fileobj.close()
+                                        for line in lines :
+                                                if line != "" :
+                                                        if line == repoarg :
+                                                                print "URL already in index"
+                                                                return
+                                else : open(self.conf.get("index-name"), "w").close()
+                                                
                                 r = RepoManager(self.conf.get('cache-name'))
                                 r.load(repoarg)
                                 r.writeCache()
-                        print "Added %(url)s" % dict(url=repoarg)
+                                print "Added %(url)s to cache" % dict(url=repoarg)
+                                fileobj = open(self.conf.get("index-name"), "a")
+                                if os.name == "nt" :
+                                    lineending = "\r\n"
+                                else : lineending = "\n"
+                                fileobj.write(repoarg + lineending)
+                                fileobj.close()
+                        
+
                         return
+                if not os.path.exists(self.conf.get("index-name")) :
+                    open(self.conf.get("index-name"), "w").close()
                 r = RepoManager(self.conf.get('cache-name'))
-				#clear out the cache
+                #clear out the cache
                 r.cache = {}
                 try:
                     f = open(self.conf.get('index-name'), 'rb')
@@ -47,7 +68,8 @@ class Main(object):
                     print "Abort"
                     return
                 for line in f:
-                    line = line[:-1]
+                    if os.name == "nt" : line = line[:-2]
+                    else : line = line[:-1]
                     print 'Processing %(url)s ...' % dict(url=line)
                     r.load(line)
                 f.close()
