@@ -11,7 +11,7 @@ class RepositoryException(Exception):
 		return str(self.msg)
 
 class Repo(object):
-	def __init__(self, url, loadnow=True, verbosity=1):
+	def __init__(self, url, loadnow=True, verbosity=0):
 		self.url = url
 		self.sections = []
 		self.expireat = 0
@@ -62,16 +62,17 @@ class Repo(object):
 						p.description = pkginfo.firstChild.nodeValue #why is this a child node?
 				s.packages.append(p)
 			self.sections.append(s)
-		pkgtotal = 0
-		for section in self.sections:
-			pkgtotal += len(section.packages)
-		if not self.silent : print "{0} section(s) in repository, totalling {1} packages".format(len(self.sections), pkgtotal)
-#		for section in self.sections:
-#			if not self.silent : print "Section '%(name)s' with '%(numpackages)s' packages" % dict(name=section.name, numpackages=len(section.packages))
-#			for package in section.packages:
-#				if not self.silent : print package
-#				if package.description and not self.silent:
-#					print "Description:"
-#					print package.description
+                if not self.silent :
+                        pkgtotal = 0
+                        for section in self.sections:
+                                pkgtotal += len(section.packages)
+                        print "{0} section(s) in repository, totalling {1} packages".format(len(self.sections), pkgtotal)
+                        for section in self.sections:
+                                print "Section '%(name)s' with '%(numpackages)s' packages" % dict(name=section.name, numpackages=len(section.packages))
+                                for package in section.packages:
+                                        print package
+                                        if package.description :
+                                                print "Description:"
+                                                print package.description
 
 

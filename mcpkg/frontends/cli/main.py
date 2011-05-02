@@ -20,6 +20,7 @@ class Main(object):
                 sub = p.add_subparsers()
                 a = sub.add_parser('update', help='Update all repositories')
                 a.set_defaults(func=self._update)
+                a.add_argument("-v", action="store_true", help="Be more verbose")
                 a.add_argument("--add-repo", action="append", nargs=1, help="Adds a repository to the cache.")
                 b = sub.add_parser('maint', help='Maintain local mcpkg data')
                 b.add_argument('--reset-all', action='store_true', help='Reset mcpkg to newly-installed state (WARNING: this deletes the .mcpkg directory)')
@@ -42,9 +43,10 @@ class Main(object):
                                                                 print "URL already in index"
                                                                 return
                                 else : open(self.conf.get("index-name"), "w").close()
-                                                
+                                if args.v : verbose = 1
+                                if not args.v : verbose = 0
                                 r = RepoManager(self.conf.get('cache-name'))
-                                r.load(repoarg)
+                                r.load(repoarg, verbose)
                                 r.writeCache()
                                 print "Added %(url)s to cache" % dict(url=repoarg)
                                 fileobj = open(self.conf.get("index-name"), "a")

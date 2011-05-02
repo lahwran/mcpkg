@@ -49,9 +49,9 @@ class RepoManager(object):
 		self._writeCache()
 	"""Load a repository from a given URI. If it's cached, it will be loaded from the cache
 	"""
-	def load(self, uri):
+	def load(self, uri, verbose=0):
 		if uri in self.cache.keys():
 			return self.cache[uri]
-		r = repo.Repo(uri)
+		r = repo.Repo(uri, verbosity=verbose)
 		self.cache[uri] = r
 		return r
