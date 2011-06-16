@@ -1,2 +1,5 @@
 #command-line interface
-__all__ = ['main', 'config']
+
+from main import run
+
+__all__ = ['main', 'config', 'run']

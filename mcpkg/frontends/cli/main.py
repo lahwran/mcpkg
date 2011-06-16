@@ -5,19 +5,55 @@ from mcpkg.repository.repomanager import RepoManager
 import glob
 import os
 import os.path
+import sys
 
+def run(arguments):
+    if not len(arguments):
+        help()
+        return
+    commands[arguments[0]](arguments[1:])
+    
 
-class Main(object):
-    def __init__(self):
-        self.parsers = {}
-        self.conf = Config()
+commands = {}
 
-    def __call__(self):
-        #application entrypoint
-        self._createParser()
-        self.args = self.parser.parse_args()
-        self.args.func(self.args)
+class MissingDocException(Exception):
+    pass
 
+def command(func):
+    "decorator that adds a command to the command list"
+    if not func.__doc__ or "\n" not in func.__doc__:
+        raise MissingDocException("Missing documentation for command %s" % func.func_name)
+    split = func.__doc__.strip().split("\n")
+    split = [(x[4:] if x.startswith(" "*4) else x) for x in split]
+    func._shortusage = split[0]
+    func._longusage = split[1]
+    
+    commands[func.func_name] = func
+    return func
+
+@command
+def testcommand(arguments):
+    """a test command
+    call to test things"""
+    print "hi from testcommand! %s" % str(arguments)
+
+standard_usage = """
+Usage: mcpkg <command>
+"""
+
+@command
+def help(arguments=[]):
+    """Show this message or command help
+    Think you're real clever asking for help on help, do ya?"""
+    if not len(arguments):
+        print standard_usage
+        print "Available commands:"
+        for i in commands:
+            print "   ", (i+":"), commands[i]._shortusage
+    else:
+        print commands[arguments[0]]._longusage
+
+"""
     def _createParser(self):
         p = argparse.ArgumentParser(description="mcpkg command-line interface.")
         sub = p.add_subparsers()
@@ -94,7 +130,4 @@ class Main(object):
                 os.remove(f)
             return
         self.parsers['maint'].print_help()
-
-
-if __name__ == "__main__":
-    Main()()
+"""
